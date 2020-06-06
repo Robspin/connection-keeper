@@ -1,6 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
+import AlertContext from '../../context/alert/alertContext';
+import AuthContext from '../../context/auth/authContext';
 
 const Register = () => {
+   const alertContext = useContext(AlertContext);
+   const authContext = useContext(AuthContext);
+
+   const { setAlert } = alertContext;
+   const { register, error, clearErrors } = authContext;
+
+   useEffect(() => {
+      if (error === 'User already exists') {
+         setAlert(error, 'danger');
+         clearErrors();
+      }
+   }, [error]);
+
    const [user, setUser] = useState({
       name: '',
       email: '',
@@ -14,7 +29,17 @@ const Register = () => {
 
    const onSubmit = e => {
       e.preventDefault();
-      console.log('123');
+      if (name === '' || email === '' || password === '') {
+         setAlert(' Please enter all fields', 'danger');
+      } else if (password !== password2) {
+         setAlert(' Passwords do not match', 'danger');
+      } else {
+         register({
+            name,
+            email,
+            password
+         });
+      }
    };
 
    return (
@@ -30,6 +55,7 @@ const Register = () => {
                   name='name'
                   value={name}
                   onChange={onChange}
+                  required
                />
             </div>
             <div className='form-group'>
@@ -39,6 +65,7 @@ const Register = () => {
                   name='email'
                   value={email}
                   onChange={onChange}
+                  required
                />
             </div>
             <div className='form-group'>
@@ -48,6 +75,8 @@ const Register = () => {
                   name='password'
                   value={password}
                   onChange={onChange}
+                  required
+                  minLength='6'
                />
             </div>
             <div className='form-group'>
@@ -57,6 +86,8 @@ const Register = () => {
                   name='password2'
                   value={password2}
                   onChange={onChange}
+                  required
+                  minLength='6'
                />
             </div>
             <input
